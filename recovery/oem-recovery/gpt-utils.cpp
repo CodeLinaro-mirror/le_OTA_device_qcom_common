@@ -62,6 +62,9 @@ extern "C" {
 #endif
 #include <endian.h>
 
+#ifdef USE_GLIB
+#include <glib.h>
+#endif
 
 /******************************************************************************
  * DEFINE SECTION

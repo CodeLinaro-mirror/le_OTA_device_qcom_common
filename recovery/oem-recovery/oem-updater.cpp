@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+#include <limits.h>
 #include "edify/expr.h"
 #include "dec.h"
 #include "gpt-utils.h"
