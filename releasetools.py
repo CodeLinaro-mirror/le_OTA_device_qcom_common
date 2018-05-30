@@ -95,7 +95,7 @@ def SplitFwTypes(files):
 
     if dotSeparated[extIdx] == 'mbn' or dotSeparated[extIdx] == 'elf' or  dotSeparated[extIdx] == 'img':
       boot[f] = files[f]
-    elif dotSeparated[extIdx] == 'bin':
+    elif dotSeparated[extIdx] == 'bin' or dotSeparated[extIdx] == 'dat':
       dest, destBak, x, y = files[f]
       if dest is not None and dest.startswith("/") and not dest.startswith ("/dev/block/bootdevice/by-name/"):
         fw[f] = files[f]
