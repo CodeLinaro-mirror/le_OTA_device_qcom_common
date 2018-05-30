@@ -69,7 +69,7 @@ extern "C" {
 /******************************************************************************
  * DEFINE SECTION
  ******************************************************************************/
-#define BLK_DEV_FILE    "/dev/block/mmcblk0"
+#define BLK_DEV_FILE    "/dev/mmcblk0"
 /* list the names of the backed-up partitions to be swapped */
 /* extension used for the backup partitions - tzbak, abootbak, etc. */
 #define BAK_PTN_NAME_EXT    "bak"
