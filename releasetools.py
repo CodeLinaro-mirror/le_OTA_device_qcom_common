@@ -187,7 +187,7 @@ def OTA_VerifyEnd(info, api_version, target_zip, source_zip=None):
       print ("Installing full update for: %s" % (fn))
       f = "firmware-update/" + fn
       common.ZipWriteStr(info.output_zip, f, tf.data)
-      update_list[f] = (dest, destBak, None, None)
+      update_list[f] = (dest, destBak, tf, None)
 
   global bootImages
   global binImages
@@ -306,7 +306,19 @@ def InstallRawImage(type, script, f, dest, tf, sf):
     script.AppendExtra('msm.decrypt("/tmp/%s", "%s");' % (fn, dest))
   else:
     if type == 'MMC':
-      script.AppendExtra('package_extract_file("%s", "%s");' % (f, dest))
+      if common.OPTIONS.ab_ota_update:
+        cmd = '('
+      else:
+        cmd = ''
+      cmd += ('package_extract_file("%s", "%s")') % (f, dest)
+      if common.OPTIONS.ab_ota_update:
+        # For A/B OTA upgrade, we want to abort if any of the
+        # image upgrade fails.
+        cmd += (' && block_device_check("%s", "%s", "%s")) ||\n'
+            '  abort("Failed to extract %s to %s");') % (dest, tf.size, tf.sha1, f, dest)
+      else:
+        cmd += (';')
+      script.AppendExtra(cmd)
     elif type == 'MTD':
       script.AppendExtra('write_raw_image(package_extract_file("%s"), "%s");' % (f, dest))
   return
@@ -315,7 +327,13 @@ def InstallRawImage(type, script, f, dest, tf, sf):
 # This function handles only non-HLOS boot images - files list must contain
 # only such images (aboot, tz, etc)
 def InstallBootImages(type, script, files):
-  if type == 'MMC':
+  if common.OPTIONS.ab_ota_update:
+    # For A/B OTA upgrade, we do not use bak partitions
+    # Just upgrade the boot images like raw images
+    for f in files:
+      dest, destBak, tf, sf = files[f]
+      InstallRawImage(type, script, f, dest, tf, sf)
+  elif type == 'MMC':
     bakExists = False
     # update main partitions
     script.AppendExtra('ifelse(msm.boot_update("main"), (')
