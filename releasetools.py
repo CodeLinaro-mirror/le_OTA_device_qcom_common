@@ -18,7 +18,13 @@
 
 import common
 import re
+import os
+import sys
+from importlib import import_module
 
+deltaUpdate = False
+deltaConfig = {}
+DiffGen = None
 
 bootImages = {}
 binImages = {}
@@ -27,12 +33,13 @@ fwImages = {}
 
 # Parse filesmap file containing firmware residing places
 def LoadFilesMap(zip, name="RADIO/filesmap"):
+  d = {}
   try:
     data = zip.read(name)
   except KeyError:
     print ("Warning: could not find %s in %s." % (name, zip))
     data = ""
-  d = {}
+    return d
   for line in data.decode().split("\n"):
     line = line.strip()
     if not line or line.startswith("#"):
@@ -51,7 +58,7 @@ def GetRadioFiles(z):
     f = info.filename
     if f.startswith("RADIO/") and (f.__len__() > len("RADIO/")):
       fn = f[6:]
-      if fn.startswith("filesmap"):
+      if fn.startswith("filesmap") or fn.startswith("delta.conf"):
         continue
       data = z.read(f)
       out[fn] = common.File(f, data)
@@ -180,7 +187,7 @@ def OTA_VerifyEnd(info, api_version, target_zip, source_zip=None):
       print ("Installing full update for: %s" % (fn))
       f = "firmware-update/" + fn
       common.ZipWriteStr(info.output_zip, f, tf.data)
-      update_list[f] = (dest, destBak, None, None)
+      update_list[f] = (dest, destBak, tf, None)
 
   global bootImages
   global binImages
@@ -247,6 +254,37 @@ def IncrementalOTA_Assertions(info):
 
 
 def IncrementalOTA_VerifyEnd(info):
+  global deltaConfig
+  global DiffGen
+  print ("Loading delta configuration...")
+  deltaConfig = LoadFilesMap(info.target_zip, "RADIO/delta.conf")
+  if deltaConfig != {}:
+    print ('delta.conf found - continue with delta update')
+    if os.path.exists(deltaConfig['root'] + deltaConfig['qdmaToolsLocation']):
+      print ('qdmaTools found - using modem delta update')
+      sys.path.append(deltaConfig['root'] + deltaConfig['qdmaToolsLocation'])
+      try:
+        DiffGen = import_module('DiffGen')
+        print ('dynamically imported DiffGen from qdmaTools')
+        global deltaUpdate
+        deltaUpdate = True
+        diff_files, err = DiffGen.GenerateDiff(common.OPTIONS, deltaConfig)
+        if err:
+          print (err)
+          sys.exit(-1)
+        print (diff_files)
+        for fname, f in diff_files.items():
+          common.ZipWriteStr(info.output_zip, fname, f.read())
+          f.close()
+        return
+      except Exception as e:
+        print (e)
+        raise AssertionError('could not dynamically import DiffGen from qdmaTools - Update Aborted')
+    else:
+      print ('qdmaTools not found - continue to full update')
+  else:
+    print ('delta.conf not found - continue with full update')
+
   OTA_VerifyEnd(info, info.target_version, info.target_zip, info.source_zip)
   return
 
@@ -268,7 +306,19 @@ def InstallRawImage(type, script, f, dest, tf, sf):
     script.AppendExtra('msm.decrypt("/tmp/%s", "%s");' % (fn, dest))
   else:
     if type == 'MMC':
-      script.AppendExtra('package_extract_file("%s", "%s");' % (f, dest))
+      if common.OPTIONS.ab_ota_update:
+        cmd = '('
+      else:
+        cmd = ''
+      cmd += ('package_extract_file("%s", "%s")') % (f, dest)
+      if common.OPTIONS.ab_ota_update:
+        # For A/B OTA upgrade, we want to abort if any of the
+        # image upgrade fails.
+        cmd += (' && block_device_check("%s", "%s", "%s")) ||\n'
+            '  abort("Failed to extract %s to %s");') % (dest, tf.size, tf.sha1, f, dest)
+      else:
+        cmd += (';')
+      script.AppendExtra(cmd)
     elif type == 'MTD':
       script.AppendExtra('write_raw_image(package_extract_file("%s"), "%s");' % (f, dest))
   return
@@ -277,7 +327,13 @@ def InstallRawImage(type, script, f, dest, tf, sf):
 # This function handles only non-HLOS boot images - files list must contain
 # only such images (aboot, tz, etc)
 def InstallBootImages(type, script, files):
-  if type == 'MMC':
+  if common.OPTIONS.ab_ota_update:
+    # For A/B OTA upgrade, we do not use bak partitions
+    # Just upgrade the boot images like raw images
+    for f in files:
+      dest, destBak, tf, sf = files[f]
+      InstallRawImage(type, script, f, dest, tf, sf)
+  elif type == 'MMC':
     bakExists = False
     # update main partitions
     script.AppendExtra('ifelse(msm.boot_update("main"), (')
@@ -379,12 +435,44 @@ def FullOTA_InstallEnd(info):
 
 
 def IncrementalOTA_InstallEnd_MMC(info):
-  OTA_InstallEnd(info)
+  global deltaUpdate
+  global deltaConfig
+  global DiffGen
+  if deltaUpdate:
+    if os.path.exists(deltaConfig['root'] + deltaConfig['qdmaToolsLocation']):
+      print ('qdmaTools found - using modem delta update')
+      sys.path.append(deltaConfig['root'] + deltaConfig['qdmaToolsLocation'])
+      try:
+        DiffGen = import_module('DiffGen')
+        print ('dynamically imported DiffGen from qdmaTools')
+        DiffGen.AddScriptCommands(info, deltaConfig)
+      except Exception as e:
+        print (e)
+        raise AssertionError('could not dynamically import DiffGen from qdmaTools - Update Aborted')
+  else:
+    print ('deltaUpdate flag was not set - modem full update took place')
+    OTA_InstallEnd(info)
   return
 
 
 def IncrementalOTA_InstallEnd_MTD(info):
-  OTA_InstallEnd(info)
+  global deltaUpdate
+  global deltaConfig
+  global DiffGen
+  if deltaUpdate:
+    if os.path.exists(deltaConfig['root'] + deltaConfig['qdmaToolsLocation']):
+      print ('qdmaTools found - using modem delta update')
+      sys.path.append(deltaConfig['root'] + deltaConfig['qdmaToolsLocation'])
+      try:
+        DiffGen = import_module('DiffGen')
+        print ('dynamically imported DiffGen from qdmaTools')
+        DiffGen.AddScriptCommands(info, deltaConfig)
+      except Exception as e:
+        print (e)
+        raise AssertionError('could not dynamically import DiffGen from qdmaTools - Update Aborted')
+  else:
+    print ('deltaUpdate flag was not set - modem full update took place')
+    OTA_InstallEnd(info)
   return
 
 
