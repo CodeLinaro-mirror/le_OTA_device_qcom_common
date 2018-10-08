@@ -92,6 +92,10 @@ def SplitFwTypes(files):
   bin = {}
   fw = {}
 
+  supportedBootExtensions = ["mbn", "elf", "img", "fv"]
+  supportedFwExtensions = ["bin", "dat"]
+  supportedBinExtensions = ["ubi"]
+
   for f in files:
     extIdx = -1
     dotSeparated = f.split(".")
@@ -100,15 +104,15 @@ def SplitFwTypes(files):
         break
       extIdx -= 1
 
-    if dotSeparated[extIdx] == 'mbn' or dotSeparated[extIdx] == 'elf' or  dotSeparated[extIdx] == 'img':
+    if dotSeparated[extIdx] in supportedBootExtensions:
       boot[f] = files[f]
-    elif dotSeparated[extIdx] == 'bin' or dotSeparated[extIdx] == 'dat':
+    elif dotSeparated[extIdx] in supportedFwExtensions:
       dest, destBak, x, y = files[f]
       if dest is not None and dest.startswith("/") and not dest.startswith ("/dev/block/bootdevice/by-name/"):
         fw[f] = files[f]
       else:
         bin[f] = files[f]
-    elif dotSeparated[extIdx] == 'ubi':
+    elif dotSeparated[extIdx] in supportedBinExtensions:
       bin[f] = files[f]
     else:
       fw[f] = files[f]
