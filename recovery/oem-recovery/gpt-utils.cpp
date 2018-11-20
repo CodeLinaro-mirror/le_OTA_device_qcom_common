@@ -82,14 +82,14 @@ extern "C" {
 //Size of the buffer that needs to be passed to the UFS ioctl
 #define UFS_ATTR_DATA_SIZE          32
 //This will allow us to get the root lun path from the path to the partition.
-//i.e: from /dev/block/sdaXXX get /dev/block/sda. The assumption here is that
+//i.e: from /dev/sdaXXX get /dev/sda. The assumption here is that
 //the boot critical luns lie between sda to sdz which is acceptable because
 //only user added external disks,etc would lie beyond that limit which do not
 //contain partitions that interest us here.
-#define PATH_TRUNCATE_LOC (sizeof("/dev/block/sda") - 1)
+#define PATH_TRUNCATE_LOC (sizeof("/dev/sda") - 1)
 
-//From /dev/block/sda get just sda
-#define LUN_NAME_START_LOC (sizeof("/dev/block/") - 1)
+//From /dev/sda get just sda
+#define LUN_NAME_START_LOC (sizeof("/dev/") - 1)
 #define BOOT_LUN_A_ID 1
 #define BOOT_LUN_B_ID 2
 /******************************************************************************

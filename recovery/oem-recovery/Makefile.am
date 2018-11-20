@@ -23,6 +23,7 @@ AM_CPPFLAGS := \
 oem_recovery_sources := gpt-utils.cpp dec.cpp oem-updater.cpp
 
 library_includedir := $(pkgincludedir)
+library_include_HEADERS := $(top_srcdir)/gpt-utils.h
 
 lib_LTLIBRARIES := librecovery_updater_msm.la
 librecovery_updater_msm_la_SOURCES := $(oem_recovery_sources)
