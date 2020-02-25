@@ -94,7 +94,7 @@ def SplitFwTypes(files):
 
   supportedBootExtensions = ["mbn", "elf", "img", "fv"]
   supportedFwExtensions = ["bin", "dat"]
-  supportedBinExtensions = ["ubi"]
+  supportedBinExtensions = ["ubi", "squashfs"]
 
   for f in files:
     extIdx = -1
@@ -324,7 +324,10 @@ def InstallRawImage(type, script, f, dest, tf, sf):
         cmd += (';')
       script.AppendExtra(cmd)
     elif type == 'MTD':
-      script.AppendExtra('write_raw_image(package_extract_file("%s"), "%s");' % (f, dest))
+      if common.OPTIONS.ab_ota_update:
+        script.AppendExtra('package_extract_file("%s", "%s");' % (f, dest))
+      else:
+        script.AppendExtra('write_raw_image(package_extract_file("%s"), "%s");' % (f, dest))
   return
 
 
