@@ -35,6 +35,7 @@
 #include "edify/expr.h"
 #include "dec.h"
 #include "gpt-utils.h"
+#include <linux/msm_ion.h>
 
 #if TARGET_ION_ABI_VERSION < 2
 Value* DecryptFn(const char* name, State* state, int argc, Expr* argv[]) {
