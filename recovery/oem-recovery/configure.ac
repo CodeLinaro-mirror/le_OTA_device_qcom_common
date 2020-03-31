@@ -72,6 +72,19 @@ fi
 
 AM_CONDITIONAL(USE_GLIB, test "x${with_glib}" = "xyes")
 
+
+AC_ARG_WITH([ion],
+      AC_HELP_STRING([--with-ion],
+         [enable libion usage, building HLOS systems which use libion]))
+
+if (test "x${with_ion}" = "xyes"); then
+    PKG_CHECK_MODULES(LIBION, libion, dummy=yes,
+          AC_MSG_ERROR(libion is required))
+
+    AC_SUBST(LIBION_CFLAGS)
+    AC_SUBST(LIBION_LIBS)
+fi
+
 AC_ARG_WITH([core-headers],
       AC_HELP_STRING([--with-core-headers=@<:@dir@:>@],
          [Specify the location of the system core headers]),
