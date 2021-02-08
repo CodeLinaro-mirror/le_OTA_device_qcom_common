@@ -17,7 +17,7 @@ AM_CPPFLAGS := \
               -Dstrlcpy=g_strlcpy \
               -Dstrlcat=g_strlcat
 
-oem_recovery_sources := gpt-utils.cpp dec.cpp oem-updater.cpp
+oem_recovery_sources := gpt-utils.cpp dec.cpp oem-updater.cpp recovery-ufs-bsg.cpp
 
 library_includedir := $(pkgincludedir)
 
