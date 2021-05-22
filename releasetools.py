@@ -167,7 +167,7 @@ def OTA_VerifyEnd(info, api_version, target_zip, source_zip=None):
     if dest.startswith("/dev/block/bootdevice/by-name/"):
       print ('file: %s has destination: %s. Using full update' % (fn, dest))
       full = True;
-    elif not dest.startswith("/"):
+    elif (not dest.startswith("/")) and not (part == "MTD"):
       print ('file: %s has destination: %s. Using full update' % (fn, dest))
       full = True;
 
