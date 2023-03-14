@@ -1,6 +1,8 @@
 # Makefile.am
 ACLOCAL_AMFLAGS := -I m4
 
+WORKSPACE := $(TOPDIR)/src
+
 AM_CFLAGS := -Wundef \
              -Wstrict-prototypes \
              -Wno-trigraphs \
@@ -11,11 +13,13 @@ AM_CFLAGS := -Wundef \
 
 AM_CPPFLAGS := \
               -I. \
+              -DUSE_MUSL \
+              -D_BSG_FRAMEWORK_KERNEL_HEADERS \
               -I$(WORKSPACE)/system/core/include \
               -I$(WORKSPACE)/OTA/recovery \
               -I$(WORKSPACE)/system/core/libsparse \
-              -Dstrlcpy=g_strlcpy \
-              -Dstrlcat=g_strlcat
+              -Dstrlcpy=strlcpy \
+              -Dstrlcat=strlcat
 
 oem_recovery_sources := gpt-utils.cpp dec.cpp oem-updater.cpp recovery-ufs-bsg.cpp
 
