@@ -54,11 +54,21 @@ def LoadFilesMap(zip, name="RADIO/filesmap"):
 # Read firmware images from target files zip
 def GetRadioFiles(z):
   out = {}
+  images_to_upgrade = []
+  img_by_img = common.OPTIONS.img_by_img
+  if img_by_img:
+    try:
+      fd = open('images_to_upgrade.txt','r')
+    except IOError as e:
+      if e.errno == errno.ENOENT:
+        raise KeyError("images_to_upgrade.txt")
+    lines = fd.readlines()
+    images_to_upgrade = ''.join(lines).rstrip().split('\n')
   for info in z.infolist():
     f = info.filename
     if f.startswith("RADIO/") and (f.__len__() > len("RADIO/")):
       fn = f[6:]
-      if fn.startswith("filesmap") or fn.startswith("delta.conf"):
+      if fn.startswith("filesmap") or fn.startswith("delta.conf") or (img_by_img and fn not in images_to_upgrade):
         continue
       data = z.read(f)
       out[fn] = common.File(f, data)
