@@ -27,8 +27,16 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * Changes from Qualcomm Innovation Center are provided under the following
+ * license: Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ *  SPDX-License-Identifier: BSD-3-Clause-Clear
+ */
+
 #ifndef __DEC_H__
 #define __DEC_H__
+
+#include <linux/msm_ion.h>
 
 #if TARGET_ION_ABI_VERSION < 2
 int decrypt_image(const char *src_file, const char *dst_file);
