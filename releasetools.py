@@ -92,7 +92,7 @@ def SplitFwTypes(files):
   bin = {}
   fw = {}
 
-  supportedBootExtensions = ["mbn", "elf", "img", "fv"]
+  supportedBootExtensions = ["mbn", "elf", "img", "fv", "melf"]
   supportedFwExtensions = ["bin", "dat"]
   supportedBinExtensions = ["ubi"]
 
