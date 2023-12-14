@@ -103,7 +103,7 @@ def SplitFwTypes(files):
   fw = {}
 
   supportedBootExtensions = ["mbn", "elf", "img", "fv", "melf"]
-  supportedFwExtensions = ["bin", "dat"]
+  supportedFwExtensions = ["bin", "dat", "qdb"]
   supportedBinExtensions = ["ubi"]
 
   for f in files:
