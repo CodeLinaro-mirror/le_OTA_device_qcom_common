@@ -12,6 +12,7 @@ AM_CFLAGS := -Wundef \
 AM_CPPFLAGS := \
               -I. \
               -I$(WORKSPACE)/system/core/include \
+	      -I$(WORKSPACE)/vendor/qcom/opensource/securemsm-kernel/include/uapi \
               -I$(WORKSPACE)/OTA/recovery \
               -I$(WORKSPACE)/system/core/libsparse \
               -Dstrlcpy=g_strlcpy \
