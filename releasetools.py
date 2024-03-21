@@ -341,7 +341,7 @@ def InstallRawImage(type, script, f, dest, tf, sf):
 # This function handles only non-HLOS boot images - files list must contain
 # only such images (aboot, tz, etc)
 def InstallBootImages(type, script, files):
-  if common.OPTIONS.ab_ota_update:
+  if common.OPTIONS.ab_ota_update or common.OPTIONS.squashfs_nand:
     # For A/B OTA upgrade, we do not use bak partitions
     # Just upgrade the boot images like raw images
     for f in files:
