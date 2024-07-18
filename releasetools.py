@@ -190,6 +190,8 @@ def OTA_VerifyEnd(info, api_version, target_zip, source_zip=None):
     if full:
       print ("Installing full update for: %s" % (fn))
       f = "firmware-update/" + fn
+      if common.OPTIONS.build_id is not None:
+        f = "build-id" + common.OPTIONS.build_id + "/firmware-update/" +fn
       common.ZipWriteStr(info.output_zip, f, tf.data)
       update_list[f] = (dest, destBak, tf, None)
 
