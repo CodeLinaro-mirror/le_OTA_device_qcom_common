@@ -72,6 +72,8 @@ fi
 
 AM_CONDITIONAL(USE_GLIB, test "x${with_glib}" = "xyes")
 
+AC_CHECK_FUNCS([strlcpy],[STRLCPY=yes],[STRLCPY=no])
+AM_CONDITIONAL([USE_G_STRLCPY_STRLCAT], [test "x$STRLCPY" = "xno" && test "x$STRLCAT" = "xno"])
 
 AC_ARG_WITH([ion],
       AC_HELP_STRING([--with-ion],
