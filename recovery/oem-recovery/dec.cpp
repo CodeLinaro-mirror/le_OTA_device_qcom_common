@@ -35,7 +35,6 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <inttypes.h>
-#include <linux/qseecom.h>
 #include <linux/msm_ion.h>
 #include <sys/ioctl.h>
 
