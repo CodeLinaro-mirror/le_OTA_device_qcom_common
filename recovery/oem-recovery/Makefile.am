@@ -13,9 +13,7 @@ AM_CPPFLAGS := \
               -I. \
               -I$(WORKSPACE)/system/core/include \
               -I$(WORKSPACE)/OTA/recovery \
-              -I$(WORKSPACE)/system/core/libsparse \
-              -Dstrlcpy=g_strlcpy \
-              -Dstrlcat=g_strlcat
+              -I$(WORKSPACE)/system/core/libsparse
 
 oem_recovery_sources := gpt-utils.cpp dec.cpp oem-updater.cpp recovery-ufs-bsg.cpp
 
@@ -33,4 +31,9 @@ if USE_GLIB
 librecovery_updater_msm_la_CFLAGS += -DUSE_GLIB @GLIB_CFLAGS@
 librecovery_updater_msm_la_CPPFLAGS += -DUSE_GLIB @GLIB_CFLAGS@
 librecovery_updater_msm_la_LIBADD +=  @GLIB_LIBS@
+endif
+
+if USE_G_STRLCPY_STRLCAT
+librecovery_updater_msm_la_CFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
+librecovery_updater_msm_la_CPPFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
 endif
