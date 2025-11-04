@@ -33,7 +33,7 @@ librecovery_updater_msm_la_CPPFLAGS += -DUSE_GLIB @GLIB_CFLAGS@
 librecovery_updater_msm_la_LIBADD +=  @GLIB_LIBS@
 endif
 
-if USE_G_STRLCPY_STRLCAT
-librecovery_updater_msm_la_CFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
-librecovery_updater_msm_la_CPPFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
+if NO_STRLCPY_STRLCAT
+AM_CFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
+AM_CPPFLAGS += -Dstrlcpy=g_strlcpy -Dstrlcat=g_strlcat
 endif
