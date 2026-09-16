@@ -37,7 +37,7 @@
 #include <inttypes.h>
 #include <sys/ioctl.h>
 
-#if TARGET_ION_ABI_VERSION < 2
+#if defined(TARGET_ION_ABI_VERSION) && TARGET_ION_ABI_VERSION < 2
 #include <linux/qseecom.h>
 #include <linux/msm_ion.h>
 /* Service IDs */

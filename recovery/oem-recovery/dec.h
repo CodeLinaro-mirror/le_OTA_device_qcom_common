@@ -37,7 +37,7 @@
 #define __DEC_H__
 
 
-#if TARGET_ION_ABI_VERSION < 2
+#if defined(TARGET_ION_ABI_VERSION) && TARGET_ION_ABI_VERSION < 2
 #include <linux/msm_ion.h>
 int decrypt_image(const char *src_file, const char *dst_file);
 #endif
