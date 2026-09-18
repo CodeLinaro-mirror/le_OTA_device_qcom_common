@@ -35,10 +35,10 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <inttypes.h>
-#include <linux/msm_ion.h>
 #include <sys/ioctl.h>
 
 #if TARGET_ION_ABI_VERSION < 2
+#include <linux/msm_ion.h>
 /* Service IDs */
 #define SCM_SVC_SSD                 0x07
 
