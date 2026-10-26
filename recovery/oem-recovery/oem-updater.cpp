@@ -36,7 +36,7 @@
 #include "dec.h"
 #include "gpt-utils.h"
 
-#if TARGET_ION_ABI_VERSION < 2
+#if defined(TARGET_ION_ABI_VERSION) && TARGET_ION_ABI_VERSION < 2
 Value* DecryptFn(const char* name, State* state, int argc, Expr* argv[]) {
     int rc = -1;
     char *src_file, *dst_file;
@@ -88,7 +88,7 @@ Value* BootUpdateFn(const char* name, State* state, int argc, Expr* argv[])
 }
 
 void Register_librecovery_updater_msm() {
-#if TARGET_ION_ABI_VERSION < 2
+#if defined(TARGET_ION_ABI_VERSION) && TARGET_ION_ABI_VERSION < 2
     RegisterFunction("msm.decrypt", DecryptFn);
 #endif
     RegisterFunction("msm.boot_update", BootUpdateFn);
